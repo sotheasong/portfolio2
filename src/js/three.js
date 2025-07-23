@@ -35,7 +35,8 @@ export default class Three {
     this.renderer.setSize(device.width, device.height);
     this.renderer.setPixelRatio(Math.min(device.pixelRatio, 2));
 
-    this.controls = new OrbitControls(this.camera, this.canvas);
+    // mouse controls
+    //this.controls = new OrbitControls(this.camera, this.canvas);
 
     this.clock = new T.Clock();
 
@@ -67,10 +68,11 @@ export default class Three {
   }
 
   render() {
-    const elapsedTime = this.clock.getElapsedTime();
+    // idling animation
+    // const elapsedTime = this.clock.getElapsedTime();
 
-    this.planeMesh.rotation.x = 0.2 * elapsedTime;
-    this.planeMesh.rotation.y = 0.1 * elapsedTime;
+    // this.planeMesh.rotation.x = 0.2 * elapsedTime;
+    // this.planeMesh.rotation.y = 0.1 * elapsedTime;
 
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.render.bind(this));
