@@ -13,7 +13,7 @@ const device = {
 
 export default class Three {
   constructor(canvas) {
-    this.canvas = canvas;
+    this.canvas = document.querySelector('#canvas');
 
     this.scene = new T.Scene();
 
@@ -21,9 +21,9 @@ export default class Three {
       75,
       device.width / device.height,
       0.1,
-      100
+      1000
     );
-    this.camera.position.set(0, 0, 2);
+    this.camera.position.setZ(30);
     this.scene.add(this.camera);
 
     this.renderer = new T.WebGLRenderer({
@@ -44,6 +44,7 @@ export default class Three {
     this.setGeometry();
     this.render();
     this.setResize();
+    this.setMouseMove();
   }
 
   setLights() {
@@ -52,27 +53,36 @@ export default class Three {
   }
 
   setGeometry() {
-    this.planeGeometry = new T.PlaneGeometry(1, 1, 128, 128);
+    const geometry = new T.PlaneGeometry(2, 2); // Fullscreen quad
+    const textureLoader = new T.TextureLoader();
+    const grainTexture = textureLoader.load(
+      "../assets/noise.png"
+    );
+
     this.planeMaterial = new T.ShaderMaterial({
-      side: T.DoubleSide,
-      wireframe: true,
       fragmentShader: fragment,
       vertexShader: vertex,
       uniforms: {
-        progress: { type: 'f', value: 0 }
-      }
+        u_time: { value: 0 },
+        u_resolution: {
+          value: new T.Vector2(device.width, device.height)
+        },
+        u_grainTexture: {
+          value: grainTexture
+        },
+        u_mouse: {
+          value: new T.Vector2(0.5, 0.5) // Centered by default
+        }
+      },
     });
 
-    this.planeMesh = new T.Mesh(this.planeGeometry, this.planeMaterial);
+    this.planeMesh = new T.Mesh(geometry, this.planeMaterial);
     this.scene.add(this.planeMesh);
   }
 
   render() {
-    // idling animation
-    // const elapsedTime = this.clock.getElapsedTime();
-
-    // this.planeMesh.rotation.x = 0.2 * elapsedTime;
-    // this.planeMesh.rotation.y = 0.1 * elapsedTime;
+    const elapsed = this.clock.getElapsedTime();
+    this.planeMaterial.uniforms.u_time.value = elapsed;
 
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this.render.bind(this));
@@ -86,10 +96,26 @@ export default class Three {
     device.width = window.innerWidth;
     device.height = window.innerHeight;
 
-    this.camera.aspect = device.width / device.height;
+    this.camera.left = -1;
+    this.camera.right = 1;
+    this.camera.top = 1;
+    this.camera.bottom = -1;
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(device.width, device.height);
     this.renderer.setPixelRatio(Math.min(device.pixelRatio, 2));
+
+    this.planeMaterial.uniforms.u_resolution.value.set(device.width, device.height);
+  }
+
+  setMouseMove() {
+    window.addEventListener('mousemove', (event) => {
+      const x = event.clientX / window.innerWidth;
+      const y = 1.0 - event.clientY / window.innerHeight; // Invert Y for GLSL
+
+      if (this.planeMaterial.uniforms.u_mouse) {
+        this.planeMaterial.uniforms.u_mouse.value.set(x, y);
+      }
+    });
   }
 }
