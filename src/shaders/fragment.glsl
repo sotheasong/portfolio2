@@ -1,11 +1,15 @@
 precision mediump float;
 
 uniform float u_time;
-uniform vec3 u_resolution;
-uniform sampler2D u_grainTexture;
+uniform vec2 u_resolution;
 uniform vec2 u_mouse;
 
-// ----- Noise Function (psrdnoise) -----
+// Up to 8 window influence zones: xy = normalized center, zw = normalized size
+uniform vec4 u_windows[8];
+uniform int u_windowCount;
+uniform int u_activeWindow; // index of focused window (-1 = none)
+
+// ----- Noise -----
 
 float psrdnoise(vec2 x, vec2 period, float alpha, out vec2 gradient) {
   vec2 uv = vec2(x.x + x.y * 0.5, x.y);
@@ -56,49 +60,69 @@ float psrdnoise(vec2 x, vec2 period, float alpha, out vec2 gradient) {
 }
 
 float random(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+  return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-// ----- Main Shader -----
+// Returns 0.0 inside window core, 1.0 outside
+float windowInfluence(vec2 uv, vec4 win) {
+  vec2 center = win.xy;
+  vec2 halfSize = win.zw * 0.5;
+  // Soft rectangular falloff
+  vec2 d = abs(uv - center) / (halfSize + 0.08);
+  float box = max(d.x, d.y);
+  return smoothstep(0.85, 1.35, box);
+}
 
 void main() {
-  vec2 fragCoord = gl_FragCoord.xy;
-  vec2 uv = fragCoord.xy / u_resolution.xy;
+  vec2 uv = gl_FragCoord.xy / u_resolution.xy;
 
-  const float nscale = 1.3;
-  const vec2 per = vec2(0.0);
-  vec2 v = vec2(0.2, 0.0);
-  float alpha = u_time * 0.5;
-
-  vec2 p = nscale * (uv - 0.5);
+  float alpha = u_time * 0.38;
+  vec2 p = 1.3 * (uv - 0.5);
   vec2 g;
 
-  float angle = u_time/2.0;
-  mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-  vec2 rp = rot * (uv - 0.5) + 0.5;
+  // Compute accumulated window suppression across all windows
+  float suppression = 0.0;
+  float stabilization = 0.0;
+  for (int i = 0; i < 8; i++) {
+    if (i >= u_windowCount) break;
+    float infl = 1.0 - windowInfluence(uv, u_windows[i]);
+    float isActive = (i == u_activeWindow) ? 1.0 : 0.0;
+    // Active window suppresses noise more strongly
+    suppression += infl * (0.07 + isActive * 0.05);
+    stabilization += infl * (0.04 + isActive * 0.03);
+  }
+  suppression = clamp(suppression, 0.0, 0.18);
+  stabilization = clamp(stabilization, 0.0, 0.12);
 
-  float warp = random(uv + u_time) * 0.03;
-  float n = 0.5 + 0.5 * psrdnoise(p - warp, per, alpha, g);
+  // Warp offset — reduced under windows
+  float warpAmt = 0.025 * (1.0 - stabilization * 6.0);
+  float warp = random(uv + u_time * 0.08) * warpAmt;
 
-  // float levels = 30.0;
-  // float n = floor(rawNoise * levels) / (levels - 1.0);
+  float n = 0.5 + 0.5 * psrdnoise(p - warp, vec2(0.0), alpha, g);
 
-  vec3 color1 = vec3(1.0, 1.0, 1.0);
-  vec3 color2 = vec3(0.5, 0.5, 0.5);
-  vec3 color3 = vec3(0.2, 0.2, 0.2);
+  // Darken and slightly compress noise range under windows (luminance suppression)
+  n = n - suppression;
+  n = clamp(n, 0.0, 1.0);
+
+  // Map noise to monochrome — charcoal-to-silver range, avoid pure white
+  vec3 darkBase  = vec3(0.07, 0.07, 0.08);
+  vec3 midBase   = vec3(0.32, 0.32, 0.33);
+  vec3 highBase  = vec3(0.62, 0.62, 0.64);
+
   vec3 color;
-  if (n < 0.5) {
-      color = mix(color1, color2, smoothstep(0.0, 0.5, n));
+  if (n < 0.45) {
+    color = mix(darkBase, midBase, smoothstep(0.0, 0.45, n));
   } else {
-      color = mix(color2, color3, smoothstep(0.5, 1.0, n));
+    color = mix(midBase, highBase, smoothstep(0.45, 1.0, n));
   }
 
-  // Subtle grain effect
-  float grainFreq = 0.02;
-  float grainStrength = 0.0;
-  float grain = random(gl_FragCoord.xy * grainFreq + u_time * 10.0);
-  grain = (grain - 0.5) * grainStrength;
-  color += grain;
+  // Radial vignette
+  float vignette = 1.0 - smoothstep(0.3, 1.1, length(uv - 0.5) * 1.6);
+  color *= (0.72 + 0.28 * vignette);
 
-  gl_FragColor = vec4(color, 1.0);
+  // Subtle temporal grain woven into field
+  float grainSeed = random(gl_FragCoord.xy * 0.8 + floor(u_time * 18.0));
+  color += (grainSeed - 0.5) * 0.028;
+
+  gl_FragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
 }

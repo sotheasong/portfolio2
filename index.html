@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- ESSENTIAL -->
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ARCHIVE // SIGNAL FIELD</title>
     <link rel="stylesheet" href="src/css/global.css" />
   </head>
   <body>
     <canvas id="canvas"></canvas>
 
-    <main>
+    <!-- Persistent system HUD -->
+    <div id="sys-hud">
+      <div class="sys-hud-line sys-hud-line--accent">SIGNAL FIELD ACTIVE</div>
+      <div class="sys-hud-line sys-clock-hud"></div>
+      <div class="sys-hud-line">ENV_VER 2.4.1</div>
+    </div>
 
-    </main>
+    <main id="workspace"></main>
 
     <script type="module" src="src/js/index.js"></script>
   </body>

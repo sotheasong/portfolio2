@@ -1,13 +1,23 @@
 import '../css/global.css';
 
 import Three from './three';
+import { initOS, initWindowManager } from './windowManager';
 
-document.addEventListener('DOMContentLoaded', () => {});
-
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   const canvas = document.querySelector('#canvas');
+  const workspace = document.querySelector('#workspace');
 
-  if (canvas) {
-    new Three(document.querySelector('#canvas'));
+  const three = new Three(canvas);
+  initWindowManager(three);
+
+  const hudClock = document.querySelector('.sys-clock-hud');
+  if (hudClock) {
+    const tick = () => {
+      hudClock.textContent = new Date().toISOString().replace('T', ' ').slice(0, 19);
+    };
+    tick();
+    setInterval(tick, 1000);
   }
+
+  await initOS(workspace);
 });
