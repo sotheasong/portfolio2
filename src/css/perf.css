@@ -1,0 +1,44 @@
+/* Pause expensive CRT animation loops when panels are click-inactive. */
+
+.win.win--inactive :is(
+  .win__crt-fx__jitter,
+  .win__crt-fx__scanlines,
+  .win__crt-fx__bloom,
+  .win__crt-fx__flicker,
+  .win__crt-fx__noise,
+  .win__crt-fx__roll,
+  .win__bezel__pressure,
+  .win__content,
+  .win__logstrip-inner
+) {
+  animation-play-state: paused !important;
+}
+
+.terminal:not(.terminal--minimized):not(.terminal--focused):not(.terminal--dormant)
+  :is(
+    .terminal__crt-fx__jitter,
+    .terminal__crt-fx__scanlines,
+    .terminal__crt-fx__bloom,
+    .terminal__crt-fx__flicker,
+    .terminal__crt-fx__noise,
+    .terminal__crt-fx__roll,
+    .terminal__bezel__pressure,
+    .terminal__layout,
+    .terminal__content-stack
+  ) {
+  animation-play-state: paused;
+}
+
+.terminal.terminal--dormant :is(
+  .terminal__crt-fx__jitter,
+  .terminal__crt-fx__scanlines,
+  .terminal__crt-fx__bloom,
+  .terminal__crt-fx__flicker,
+  .terminal__crt-fx__noise,
+  .terminal__crt-fx__roll,
+  .terminal__bezel__pressure,
+  .terminal__layout,
+  .terminal__content-stack
+) {
+  animation-play-state: paused;
+}

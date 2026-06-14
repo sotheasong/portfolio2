@@ -1,0 +1,184 @@
+@media (prefers-reduced-motion: reduce) {
+  .terminal__cursor,
+  .terminal,
+  .terminal__shell,
+  .terminal__workspace {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .terminal__crt::before,
+  .terminal__crt::after {
+    transform: none;
+  }
+
+  .terminal__crt,
+  .terminal:not(.terminal--minimized) .terminal__crt,
+  .terminal__shell,
+  .terminal:not(.terminal--minimized) .terminal__shell,
+  .terminal--minimized .terminal__shell {
+    transform: none !important;
+  }
+
+  .terminal__titlebar,
+  .terminal__screen,
+  .terminal__body[data-gl-panel] {
+    transform: none !important;
+  }
+
+  .terminal__signal-pulse__core,
+  .terminal__telemetry__cell,
+  .terminal__crt-fx__jitter,
+  .terminal__content-stack,
+  .terminal__screen :where(.terminal__input-line, .terminal__cursor) {
+    animation: none !important;
+  }
+
+  .terminal:not(.terminal--minimized).terminal--focused .terminal__signal-pulse__core {
+    opacity: 0.85;
+  }
+
+  .terminal:not(.terminal--minimized).terminal--focused .terminal__telemetry__cell {
+    opacity: 0.55;
+  }
+
+  .terminal__crt-fx__jitter,
+  .terminal__crt-fx__scanlines,
+  .terminal__crt-fx__bloom,
+  .terminal__crt-fx__diffuse,
+  .terminal__crt-fx__flicker,
+  .terminal__crt-fx__noise,
+  .terminal__crt-fx__roll,
+  .terminal__shell,
+  .terminal__titlebar,
+  .terminal__workspace {
+    animation: none !important;
+  }
+
+  .terminal__crt.terminal__crt--glitch .terminal__shell,
+  .terminal__crt.terminal__crt--glitch .terminal__crt-fx__chroma,
+  .terminal__crt.terminal__crt--glitch .terminal__crt-fx__glitchbars,
+  .terminal__crt.terminal__crt--glitch .terminal__crt-fx__scanlines,
+  .terminal__crt.terminal__crt--glitch .terminal__crt-fx__jitter,
+  .terminal__crt.terminal__crt--glitch .terminal__crt-fx__flicker,
+  .terminal__crt.terminal__crt--glitch .terminal__layout {
+    animation: none !important;
+  }
+
+  .win__crt-fx__jitter,
+  .win__crt-fx__scanlines,
+  .win__crt-fx__bloom,
+  .win__crt-fx__flicker,
+  .win__crt-fx__noise,
+  .win__crt-fx__roll,
+  .win__bezel__pressure,
+  .win--focused .win__content {
+    animation: none !important;
+  }
+
+  .win.win--glitch,
+  .win.win--glitch .win__surface,
+  .win.win--glitch .win__crt-fx__chroma,
+  .win.win--glitch .win__crt-fx__glitchbars,
+  .win.win--glitch .win__crt-fx__scanlines,
+  .win.win--glitch .win__crt-fx__jitter,
+  .win.win--glitch .win__crt-fx__flicker {
+    animation: none !important;
+  }
+
+  .terminal--booting .terminal__boot {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .boot-screen,
+  .boot-screen__scanlines,
+  .boot-screen__scanlines-outer,
+  .boot-screen__noise,
+  .boot-screen__crt-noise,
+  .boot-screen__crt-jitter,
+  .boot-screen__flicker,
+  .boot-screen__flicker-outer,
+  .boot-screen__bloom,
+  .boot-screen__roll,
+  .boot-screen__viewport,
+  .boot-screen__sync-beam {
+    animation: none !important;
+  }
+
+  .boot-screen__noise,
+  .boot-screen__scanlines,
+  .boot-screen__scanlines-outer {
+    opacity: 0.2;
+    transform: none;
+  }
+
+  .boot-screen__viewport {
+    filter: contrast(1.05) saturate(0.9) brightness(0.94);
+  }
+
+  .boot-screen__identity {
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .boot-screen--handoff,
+  .boot-screen--exit,
+  .boot-screen__handoff-beam,
+  .boot-screen__wash {
+    animation: none !important;
+  }
+
+  body.boot-screen-handoff #canvas,
+  body.boot-screen-handoff .terminal.terminal--boot-reveal .terminal__crt,
+  body.boot-screen-handoff .terminal.terminal--boot-reveal .terminal__open-cursor {
+    animation: none !important;
+    opacity: 1;
+    visibility: visible;
+    filter: none;
+    transform: none;
+  }
+
+  .terminal--opening,
+  .terminal--opening-p1,
+  .terminal--opening-p2,
+  .terminal--opening-p3,
+  .terminal--opening-p4,
+  .terminal--closing,
+  .terminal--opening .terminal__crt,
+  .terminal--opening-p2 .terminal__crt,
+  .terminal--opening-p3 .terminal__crt,
+  .terminal--opening .terminal__shell,
+  .terminal--opening-p2 .terminal__shell,
+  .terminal--opening-p3 .terminal__shell,
+  .terminal--opening-p4 .terminal__shell,
+  .terminal--opening-p4 .terminal__content-stack,
+  .terminal--opening-p4 .terminal__content-reveal,
+  .terminal--opening-p4 .terminal__history-line,
+  .terminal--opening-p4 .terminal__input-row,
+  .terminal--opening-p1 .terminal__bar-fx,
+  .terminal--opening-p1 .terminal__signal-unlock,
+  .terminal--closing .terminal__shell,
+  .terminal--minimized .terminal__shell,
+  .terminal--minimized .terminal__shell::before,
+  .terminal--minimized .terminal__open-cursor,
+  .terminal--minimized .terminal__bar-fx__scanlines,
+  .terminal--minimized .terminal__bar-fx__refraction,
+  .terminal:not(.terminal--minimized) .terminal__shell,
+  .terminal:not(.terminal--minimized) .terminal__shell::before,
+  .terminal:not(.terminal--minimized) .terminal__shell-material,
+  .terminal__bezel,
+  .terminal__bezel__pressure {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    filter: none !important;
+    will-change: auto !important;
+  }
+
+  .terminal__telemetry__cell {
+    animation: none !important;
+    opacity: 0.35 !important;
+  }
+}

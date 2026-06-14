@@ -1,0 +1,467 @@
+/* Float windows — CRT stack (mirrors main terminal expanded panel) */
+
+.win {
+  overflow: hidden;
+  transition: transform 0.14s ease-out;
+}
+
+.win--dragging,
+.win--resizing {
+  transition: transform 0.08s ease-out;
+}
+
+.win__surface {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateZ(var(--win-lift-z, 8px));
+  transform-style: preserve-3d;
+}
+
+/* ── CRT overlay root ────────────────────────────────────────────────── */
+
+.win__crt-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.win__crt-fx,
+.win__crt-fx * {
+  pointer-events: none !important;
+}
+
+.win__crt-fx__glass {
+  position: absolute;
+  inset: 0;
+  z-index: 14;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      118deg,
+      rgba(255, 255, 255, 0.055) 0%,
+      rgba(255, 255, 255, 0.015) 24%,
+      transparent 50%
+    ),
+    linear-gradient(
+      328deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 34%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.09) 0%,
+      rgba(255, 255, 255, 0.03) 8%,
+      transparent 18%,
+      transparent 82%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.11),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.09),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.42),
+    inset 0 0 36px rgba(255, 255, 255, 0.035),
+    inset 0 0 72px rgba(0, 0, 0, 0.08);
+  opacity: 0.94;
+}
+
+.win__crt-fx__jitter {
+  position: absolute;
+  inset: 0;
+  animation: crt-subpixel-jitter-subtle 0.2s steps(3) infinite;
+}
+
+.win.win--inactive .win__crt-fx__jitter {
+  animation: none;
+}
+
+.win.win--focused .win__crt-fx__jitter {
+  animation: crt-subpixel-jitter-subtle 0.2s steps(3) infinite;
+}
+
+.win__crt-fx__scanlines {
+  position: absolute;
+  inset: -1px;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.28) 0,
+    rgba(0, 0, 0, 0.28) var(--crt-pixel),
+    rgba(0, 0, 0, 0) var(--crt-pixel),
+    rgba(0, 0, 0, 0) var(--crt-scan-period)
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.72;
+  animation: crt-scan-drift 8s linear infinite;
+}
+
+.win.win--inactive .win__crt-fx__scanlines {
+  opacity: 0.48;
+}
+
+.win__crt-fx__bloom {
+  position: absolute;
+  inset: -14% -22%;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+  opacity: 0.58;
+  animation: crt-bloom-pulse 3.2s ease-in-out infinite;
+}
+
+.win.win--inactive .win__crt-fx__bloom {
+  opacity: 0.32;
+  animation: none;
+}
+
+.win__crt-fx__diffuse {
+  position: absolute;
+  pointer-events: none;
+}
+
+.win__crt-fx__diffuse--h {
+  inset: 8% -8%;
+  background: radial-gradient(
+    ellipse 92% 34% at 50% 44%,
+    rgba(255, 186, 56, 0.1) 0%,
+    rgba(255, 186, 56, 0.03) 44%,
+    transparent 72%
+  );
+  transform: scaleX(1.75) scaleY(0.72);
+  transform-origin: 50% 46%;
+  filter: blur(5px);
+  opacity: 0.82;
+}
+
+.win__crt-fx__diffuse--v {
+  inset: -4% 12%;
+  background: radial-gradient(
+    ellipse 48% 55% at 50% 48%,
+    rgba(255, 186, 56, 0.04) 0%,
+    transparent 68%
+  );
+  transform: scaleX(0.72) scaleY(1.15);
+  filter: blur(3px);
+  opacity: 0.45;
+}
+
+.win__crt-fx__diffuse--accent {
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 26% 15% at 61% 38%,
+      rgba(255, 232, 168, 0.14) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 22% 13% at 32% 52%,
+      rgba(255, 186, 56, 0.09) 0%,
+      transparent 70%
+    );
+  filter: blur(3.5px);
+  opacity: 0.65;
+  mix-blend-mode: plus-lighter;
+}
+
+.win__crt-fx__phosphor {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 186, 56, 0.03) 0,
+    rgba(255, 186, 56, 0.03) var(--crt-phosphor-stripe),
+    rgba(255, 220, 120, 0.022) var(--crt-phosphor-stripe),
+    rgba(255, 220, 120, 0.022) calc(var(--crt-phosphor-stripe) * 2),
+    rgba(72, 228, 255, 0.026) calc(var(--crt-phosphor-stripe) * 2),
+    rgba(72, 228, 255, 0.026) calc(var(--crt-phosphor-stripe) * 3)
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0.48;
+}
+
+.win__crt-fx__vignette {
+  position: absolute;
+  inset: -6%;
+  background: radial-gradient(
+    ellipse 74% 62% at 50% 40%,
+    transparent 34%,
+    rgba(0, 0, 0, 0.12) 62%,
+    rgba(0, 0, 0, 0.38) 90%,
+    rgba(0, 0, 0, 0.48) 100%
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.92;
+  mask-image: linear-gradient(180deg, #000 0%, #000 72%, rgba(0, 0, 0, 0.4) 84%, transparent 92%);
+}
+
+.win__crt-fx__curvature {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 96px 28px rgba(0, 0, 0, 0.48),
+    inset 0 0 180px 72px rgba(0, 0, 0, 0.24),
+    inset 0 4px 2px rgba(255, 255, 255, 0.08),
+    inset 0 -14px 32px rgba(0, 0, 0, 0.12),
+    inset 6px 0 24px rgba(0, 0, 0, 0.12),
+    inset -6px 0 24px rgba(0, 0, 0, 0.12);
+  background: radial-gradient(
+    ellipse 72% 58% at 50% 38%,
+    rgba(255, 255, 255, 0.055) 0%,
+    transparent 48%
+  );
+  mix-blend-mode: overlay;
+  mask-image: linear-gradient(180deg, #000 0%, #000 70%, transparent 88%);
+}
+
+.win__crt-fx__flicker {
+  position: absolute;
+  inset: 0;
+  background: rgba(220, 220, 230, 0.035);
+  mix-blend-mode: overlay;
+  opacity: 0.62;
+  animation: crt-flicker 5.5s steps(20) infinite;
+}
+
+.win.win--inactive .win__crt-fx__flicker {
+  opacity: 0.35;
+}
+
+.win__crt-fx__noise {
+  position: absolute;
+  inset: -12px;
+  opacity: 0.048;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' seed='17' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  animation: crt-noise 0.22s steps(5) infinite;
+}
+
+.win__crt-fx__roll {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 186, 56, 0.08) 30%,
+    rgba(255, 232, 168, 0.22) 50%,
+    rgba(255, 186, 56, 0.08) 70%,
+    transparent 100%
+  );
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  animation: crt-roll 7.2s linear infinite;
+}
+
+.win__crt-fx__chroma {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 186, 56, 0.08) 0%, transparent 28%, transparent 72%, var(--phosphor-cyan-dim) 100%),
+    linear-gradient(0deg, transparent 40%, rgba(255, 186, 56, 0.03) 50%, transparent 60%);
+  mix-blend-mode: screen;
+}
+
+.win__crt-fx__glitchbars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 14px,
+    rgba(0, 0, 0, 0.42) 14px 16px,
+    transparent 16px 38px,
+    rgba(255, 255, 255, 0.05) 38px 39px
+  );
+  mix-blend-mode: color-dodge;
+}
+
+/* ── Bezel (tube edge compression) ───────────────────────────────────── */
+
+.win__bezel {
+  position: absolute;
+  inset: 0;
+  z-index: 14;
+  pointer-events: none;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.win__bezel * {
+  pointer-events: none;
+}
+
+.win__bezel__vignette {
+  position: absolute;
+  inset: -2%;
+  background:
+    radial-gradient(
+      ellipse 80% 68% at 50% 40%,
+      transparent 32%,
+      rgba(0, 0, 0, 0.14) 58%,
+      rgba(0, 0, 0, 0.42) 86%,
+      rgba(0, 0, 0, 0.52) 100%
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.38) 0%, transparent 8%, transparent 92%, rgba(0, 0, 0, 0.38) 100%);
+  mix-blend-mode: multiply;
+  opacity: 0.82;
+  mask-image: linear-gradient(180deg, #000 0%, #000 68%, rgba(0, 0, 0, 0.35) 82%, transparent 90%);
+}
+
+.win__bezel__pressure {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse 92% 76% at 50% 40%,
+    transparent 54%,
+    rgba(0, 0, 0, 0.06) 72%,
+    rgba(0, 0, 0, 0.16) 88%,
+    rgba(0, 0, 0, 0.22) 100%
+  );
+  box-shadow:
+    inset 0 0 64px 18px rgba(0, 0, 0, 0.32),
+    inset 0 0 100px 38px rgba(0, 0, 0, 0.16);
+  opacity: 0.85;
+  animation: bezel-pressure-breathe 14s ease-in-out infinite;
+  mask-image: linear-gradient(180deg, #000 0%, #000 66%, transparent 86%);
+}
+
+.win.win--inactive .win__bezel__pressure {
+  animation: none;
+  opacity: 0.55;
+}
+
+.win__bezel__thickness {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.38) 0%, rgba(0, 0, 0, 0.12) 2.5%, transparent 5%),
+    linear-gradient(270deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.14) 2.5%, transparent 5%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 3.5%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.06) 3%, transparent 6%);
+  opacity: 0.75;
+  mix-blend-mode: overlay;
+  mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 88%);
+}
+
+.win__bezel__rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.16),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.82),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.035);
+  background: linear-gradient(
+    152deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.05) 6%,
+    transparent 14%
+  );
+}
+
+/* ── Content phosphor life when focused ──────────────────────────────── */
+
+.win.win--focused .win__content {
+  animation: crt-content-nudge-soft 0.2s steps(3) infinite;
+}
+
+.win.win--focused .win__crt-fx__bloom {
+  animation: crt-bloom-pulse 3.2s ease-in-out infinite, term-active-phosphor-breathe 4.8s ease-in-out infinite;
+}
+
+/* ── Drag / resize signal stress ─────────────────────────────────────── */
+
+.win--dragging .win__crt-fx__scanlines {
+  opacity: 0.88;
+  animation: crt-scan-snap 0.16s steps(3, end) 1, crt-scan-drift 8s linear infinite, win-scan-distort 0.08s steps(2) infinite;
+}
+
+.win--resizing .win__crt-fx__scanlines {
+  opacity: 0.78;
+  animation: crt-scan-snap 0.14s steps(2, end) 1, crt-scan-drift 8s linear infinite, win-scan-distort 0.1s steps(3) infinite;
+}
+
+.win--dragging .win__crt-fx__noise {
+  opacity: 0.07;
+}
+
+/* ── Glitch burst (scheduled from crt-glitches.js) ───────────────────── */
+/* Filter-only on .win — transform is reserved for drag position */
+
+@keyframes win-glitch-luma {
+  0%,
+  100% {
+    filter: contrast(1.08) saturate(0.92) brightness(1.03);
+  }
+  33% {
+    filter: contrast(1.16) saturate(1) brightness(1.1);
+  }
+  66% {
+    filter: contrast(1.1) saturate(0.96) brightness(1.05);
+  }
+}
+
+.win.win--glitch {
+  /* No filter animation on .win — preserves 3D tilt */
+}
+
+.win.win--glitch .win__surface {
+  animation: crt-glitch-content 0.14s steps(2, end) 1 !important;
+}
+
+.win.win--glitch .win__crt-fx__chroma {
+  animation: crt-chroma-pop 0.2s steps(3, end) 1 !important;
+  opacity: 1;
+}
+
+.win.win--glitch .win__crt-fx__glitchbars {
+  animation: crt-bars-pop 0.18s steps(3, end) 1 !important;
+}
+
+.win.win--glitch .win__crt-fx__scanlines {
+  animation: crt-scan-snap 0.16s steps(3, end) 1, crt-scan-drift 8s linear infinite !important;
+}
+
+.win.win--glitch .win__crt-fx__jitter {
+  animation: crt-glitch-jitter 0.14s steps(4, end) 1 !important;
+}
+
+.win.win--glitch .win__crt-fx__flicker {
+  animation: crt-glitch-flicker 0.12s steps(3, end) 1 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .win__crt-fx__jitter,
+  .win__crt-fx__scanlines,
+  .win__crt-fx__bloom,
+  .win__crt-fx__flicker,
+  .win__crt-fx__noise,
+  .win__crt-fx__roll,
+  .win__bezel__pressure,
+  .win--focused .win__content {
+    animation: none !important;
+  }
+
+  .win.win--glitch,
+  .win.win--glitch .win__surface,
+  .win.win--glitch .win__crt-fx__chroma,
+  .win.win--glitch .win__crt-fx__glitchbars,
+  .win.win--glitch .win__crt-fx__scanlines,
+  .win.win--glitch .win__crt-fx__jitter,
+  .win.win--glitch .win__crt-fx__flicker {
+    animation: none !important;
+  }
+}

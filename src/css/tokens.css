@@ -1,0 +1,122 @@
+/* ------------------------------------------------------------------ */
+/* Monochrome glass terminal + DOM CRT (shader UI rects off in three.js) */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --term-fg: #fafafc;
+  --term-dim: #d4d4d8;
+  --term-muted: rgba(228, 228, 232, 0.82);
+  --term-accent: #c4c4c8;
+  --term-glow: rgba(255, 255, 255, 0.85);
+  /* Phosphor amber — emerges on focus, motion, activity */
+  --phosphor-amber: #ffd050;
+  --phosphor-amber-hot: #ffe888;
+  --phosphor-amber-core: #fff4c8;
+  --phosphor-amber-glow: rgba(255, 210, 80, 0.98);
+  --phosphor-amber-mist: rgba(255, 186, 56, 0.12);
+  --phosphor-amber-edge: rgba(255, 186, 56, 0.55);
+  --phosphor-amber-dim: rgba(255, 210, 100, 0.75);
+  --phosphor-cyan: rgba(72, 228, 255, 0.55);
+  --phosphor-cyan-dim: rgba(72, 228, 255, 0.22);
+  /* Phosphor diffusion — directional bleed, not uniform blur halos */
+  --diffuse-core: 0 0 1px;
+  --diffuse-hi-tight:
+    var(--diffuse-core) rgba(255, 255, 255, 0.95),
+    1px 0 3px rgba(255, 255, 255, 0.75),
+    -0.5px 0 2px rgba(255, 255, 255, 0.55);
+  --diffuse-hi-mid:
+    2px 0 7px rgba(255, 255, 255, 0.42),
+    -1.5px 0 5px rgba(255, 255, 255, 0.28),
+    0 0.5px 4px rgba(255, 255, 255, 0.32);
+  --diffuse-hi-far:
+    3.5px 0.5px 14px rgba(255, 255, 255, 0.16),
+    -2.5px 1px 18px rgba(255, 255, 255, 0.1);
+  --term-text-glow: var(--diffuse-hi-tight), var(--diffuse-hi-mid), var(--diffuse-hi-far);
+  --diffuse-amber-tight:
+    var(--diffuse-core) rgba(255, 248, 228, 0.98),
+    1.5px 0 3px rgba(255, 220, 130, 0.82),
+    -1px 0 2px rgba(255, 200, 90, 0.58);
+  --diffuse-amber-mid:
+    2.5px 0 8px rgba(255, 200, 85, 0.52),
+    -2px 0 6px rgba(255, 186, 56, 0.38),
+    0 1px 5px rgba(255, 210, 110, 0.36);
+  --diffuse-amber-far:
+    4px 0.5px 16px rgba(255, 186, 56, 0.24),
+    -3px 1px 20px rgba(255, 186, 56, 0.14),
+    1px 1.5px 12px rgba(255, 220, 120, 0.16);
+  --term-text-glow-amber: var(--diffuse-amber-tight), var(--diffuse-amber-mid), var(--diffuse-amber-far);
+  --term-text-glow-dim:
+    var(--diffuse-core) rgba(255, 255, 255, 0.9),
+    1px 0 4px rgba(255, 255, 255, 0.45),
+    0 0.5px 6px rgba(255, 255, 255, 0.22);
+  --term-text-glow-titlebar:
+    0 0 1px rgba(255, 255, 255, 0.5),
+    1px 0 4px rgba(255, 255, 255, 0.22),
+    -0.5px 0 3px rgba(255, 255, 255, 0.12);
+  --diffuse-amber-hot-tight:
+    var(--diffuse-core) rgba(255, 252, 238, 1),
+    2px 0 4px rgba(255, 230, 150, 0.92),
+    -1px 0 3px rgba(255, 210, 100, 0.65);
+  --diffuse-amber-hot-mid:
+    3px 0 10px rgba(255, 210, 90, 0.62),
+    -2.5px 0 8px rgba(255, 186, 56, 0.45),
+    0 1px 6px rgba(255, 220, 130, 0.48);
+  --diffuse-amber-hot-far:
+    5px 1px 20px rgba(255, 186, 56, 0.32),
+    -4px 1.5px 26px rgba(255, 186, 56, 0.18),
+    2px 2px 14px rgba(255, 232, 168, 0.2);
+  --term-text-glow-amber-hot:
+    var(--diffuse-amber-hot-tight), var(--diffuse-amber-hot-mid), var(--diffuse-amber-hot-far);
+  --term-diffuse-cursor:
+    var(--diffuse-core) rgba(255, 254, 245, 1),
+    2px 0 5px rgba(255, 220, 130, 0.88),
+    4px 0 11px rgba(255, 200, 85, 0.62),
+    -1.5px 0 7px rgba(255, 186, 56, 0.48),
+    0 0.5px 6px rgba(255, 210, 110, 0.55),
+    5px 1px 18px rgba(255, 186, 56, 0.28),
+    -3px 1.5px 14px rgba(255, 186, 56, 0.16);
+  --term-panel-bg: rgba(18, 18, 20, 0.97);
+  --term-panel-head: rgba(22, 22, 24, 0.98);
+  --term-border: rgba(180, 180, 190, 0.22);
+  --term-border-hi: rgba(255, 255, 255, 0.12);
+  --term-border-soft: rgba(120, 120, 128, 0.28);
+  --term-shadow: rgba(0, 0, 0, 0.55);
+  --term-tilt-x: 1.6deg;
+  --term-tilt-y: 0deg;
+  --term-lift-z: 18px;
+  --win-tilt-x: 1.15deg;
+  --win-tilt-y: 0deg;
+  --win-lift-z: 8px;
+  /* Content zoom inside fixed window frame (1 = no zoom) */
+  --term-content-zoom: 1.32;
+  /* CRT pixel pitch — visible scanlines / phosphor striping */
+  --crt-pixel: 2px;
+  --crt-scan-period: 5px;
+  --crt-phosphor-stripe: 2px;
+  --crt-mesh-cell: 10px;
+  --glass-rim-hi: rgba(255, 255, 255, 0.14);
+  --glass-rim-mid: rgba(255, 255, 255, 0.07);
+  --glass-rim-lo: rgba(255, 255, 255, 0.03);
+  --glass-edge-dark: rgba(0, 0, 0, 0.55);
+  --glass-edge-bloom: rgba(255, 255, 255, 0.06);
+  --glass-smoke-top: rgba(32, 32, 38, 0.92);
+  /* Inertial / hardware easing — no spring overshoot */
+  --ease-mass: cubic-bezier(0.16, 1, 0.28, 1);
+  --ease-decay: cubic-bezier(0.33, 0, 0.18, 1);
+  --glass-smoke-mid: rgba(16, 16, 20, 0.94);
+  --glass-smoke-deep: rgba(8, 8, 10, 0.97);
+  --font-ui: 'Eurostile', 'EuroStyle', 'Square 721', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.terminal__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+

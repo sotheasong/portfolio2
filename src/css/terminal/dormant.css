@@ -1,0 +1,177 @@
+/* Terminal dormant — float window has focus; main panel idles in background */
+
+/* ── Click-away inactive (no float windows stealing focus) ─────────── */
+
+.terminal:not(.terminal--minimized):not(.terminal--focused):not(.terminal--dormant)
+  .terminal__shell {
+  filter: contrast(0.94) saturate(0.55) brightness(0.76);
+  transition:
+    transform 0.45s var(--ease-decay),
+    filter 0.45s var(--ease-decay),
+    box-shadow 0.45s var(--ease-decay);
+}
+
+.terminal:not(.terminal--minimized):not(.terminal--focused):not(.terminal--dormant)
+  .terminal__crt-fx__bloom {
+  opacity: 0.38;
+  animation: none;
+}
+
+.terminal:not(.terminal--minimized):not(.terminal--focused):not(.terminal--dormant)
+  .terminal__prompt-line:has(.terminal__input-line:focus)
+  .terminal__chevron--input,
+.terminal:not(.terminal--minimized):not(.terminal--focused):not(.terminal--dormant)
+  .terminal__prompt-line:has(.terminal__input-line:focus)
+  .terminal__prompt {
+  color: var(--term-dim);
+  text-shadow: none;
+}
+
+/* ── Dormant: sink, no mouse-tilt chase, no input life ─────────────── */
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__shell {
+  filter: contrast(0.94) saturate(0.48) brightness(0.58);
+  transition:
+    transform 0.55s var(--ease-decay),
+    filter 0.55s var(--ease-decay),
+    box-shadow 0.55s var(--ease-decay);
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__crt-fx__jitter,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__content-stack,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__layout {
+  animation: none !important;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__sheen,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__bevel,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__pool {
+  opacity: 0.35;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__zone--id,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__zone--ops,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__zone--signal {
+  opacity: 0.42;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__id,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__node,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__instr__mark,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__hint,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__hint-key,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__hint-label {
+  opacity: 0.38;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__signal-pulse {
+  opacity: 0.28;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__signal-pulse__core {
+  animation: none;
+  opacity: 0.35;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__telemetry__cell {
+  opacity: 0.25;
+  animation: none;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__output,
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__input-line {
+  opacity: 0.72;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__cursor {
+  opacity: 0 !important;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__crt-fx__bloom {
+  opacity: 0.35;
+  animation: none;
+}
+
+.terminal:not(.terminal--minimized).terminal--dormant .terminal__screen {
+  cursor: default;
+}
+
+/* ── Active + focused: drift, breathe, micro-flicker (not dormant) ───── */
+
+.terminal:not(.terminal--minimized).terminal--focused:not(.terminal--dormant):not(
+    .terminal--opening
+  ):not(.terminal--closing)
+  .terminal__layout {
+  animation: term-idle-drift 7.2s ease-in-out infinite;
+}
+
+.terminal:not(.terminal--minimized).terminal--focused:not(.terminal--dormant):not(
+    .terminal--opening
+  ):not(.terminal--closing)
+  .terminal__crt-fx__bloom {
+  animation: term-active-phosphor-breathe 4.8s ease-in-out infinite;
+}
+
+.terminal:not(.terminal--minimized).terminal--focused:not(.terminal--dormant):not(
+    .terminal--opening
+  ):not(.terminal--closing)
+  .terminal__crt-fx__scanlines {
+  animation: term-signal-flicker 0.14s steps(2) infinite;
+}
+
+@keyframes term-idle-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(1px, -1px);
+  }
+  50% {
+    transform: translate(-1.5px, 0.5px);
+  }
+  75% {
+    transform: translate(0.5px, 1px);
+  }
+}
+
+@keyframes term-active-phosphor-breathe {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  40% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes term-signal-flicker {
+  0%,
+  88%,
+  100% {
+    opacity: 1;
+  }
+  89% {
+    opacity: 0.92;
+  }
+  91% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.96;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal:not(.terminal--minimized).terminal--focused:not(.terminal--dormant)
+    .terminal__layout,
+  .terminal:not(.terminal--minimized).terminal--focused:not(.terminal--dormant)
+    .terminal__crt-fx__bloom,
+  .terminal:not(.terminal--minimized).terminal--focused:not(.terminal--dormant)
+    .terminal__crt-fx__scanlines {
+    animation: none !important;
+  }
+}

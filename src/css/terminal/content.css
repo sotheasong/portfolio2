@@ -1,0 +1,807 @@
+/* Amber glow on hover — every text label in the terminal chrome */
+.terminal .terminal__shell :where(
+  .terminal__chevron--input,
+  .terminal__open .terminal__chevron,
+  .terminal__open-prompt,
+  .terminal__open-cursor,
+  .terminal__prompt,
+  .terminal__history-line,
+  .terminal__output
+) {
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.terminal .terminal__shell :where(
+  .terminal__chevron--input,
+  .terminal__open .terminal__chevron,
+  .terminal__open-prompt,
+  .terminal__open-cursor,
+  .terminal__prompt,
+  .terminal__history-line,
+  .terminal__output
+):hover {
+  color: var(--phosphor-amber-hot);
+  text-shadow: var(--term-text-glow-amber-hot);
+}
+
+.terminal .terminal__shell .terminal__titlebar :where(
+  .terminal__instr__id,
+  .terminal__instr__node,
+  .terminal__path,
+  .terminal__instr__mark,
+  .terminal__hint-key,
+  .terminal__hint-label
+) {
+  transition:
+    color 0.35s var(--ease-decay),
+    text-shadow 0.35s var(--ease-decay),
+    opacity 0.35s var(--ease-decay);
+}
+
+.terminal:not(.terminal--minimized).terminal--focused
+  .terminal__shell
+  .terminal__titlebar
+  :where(.terminal__instr__id, .terminal__instr__node):hover {
+  color: var(--phosphor-amber-dim);
+}
+
+.terminal__prompt-line .terminal__chevron--input,
+.terminal__prompt-line .terminal__prompt {
+  color: var(--term-dim);
+  text-shadow: none;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.terminal__prompt-line:has(.terminal__input-line:focus) .terminal__chevron--input,
+.terminal__prompt-line:has(.terminal__input-line:focus) .terminal__prompt {
+  color: var(--phosphor-amber);
+  text-shadow: var(--term-text-glow-amber);
+}
+
+.terminal__output::selection,
+.terminal__history-line::selection {
+  background: rgba(255, 186, 56, 0.22);
+  color: var(--term-fg);
+  text-shadow: none;
+}
+
+.terminal__input-line::selection {
+  background: transparent;
+  color: inherit;
+  text-shadow: none;
+}
+
+.terminal__input-line:focus::selection {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.terminal__open,
+.terminal__close,
+.terminal__hint-key,
+[data-gl-panel] {
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.25s ease,
+    text-shadow 0.25s ease;
+}
+
+@keyframes instr-pulse-idle {
+  0%,
+  100% {
+    left: 8%;
+    opacity: 0.25;
+  }
+  50% {
+    left: 72%;
+    opacity: 0.45;
+  }
+}
+
+@keyframes instr-pulse-active {
+  0%,
+  100% {
+    left: 4%;
+    opacity: 0.7;
+    transform: translateY(-50%) scale(1);
+  }
+  50% {
+    left: 88%;
+    opacity: 1;
+    transform: translateY(-50%) scale(1.15);
+  }
+}
+
+@keyframes telemetry-a {
+  0%,
+  14%,
+  100% {
+    opacity: 0.2;
+    background: rgba(44, 44, 48, 0.95);
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.72);
+  }
+  15%,
+  16% {
+    opacity: 0.95;
+    background: var(--phosphor-amber);
+    box-shadow:
+      1px 0 3px var(--phosphor-amber-dim),
+      -0.5px 0 2px rgba(255, 186, 56, 0.35);
+  }
+  71%,
+  72% {
+    opacity: 0.65;
+    background: rgba(255, 186, 56, 0.75);
+    box-shadow:
+      1.5px 0 3px rgba(255, 186, 56, 0.28),
+      -1px 0 2px rgba(255, 186, 56, 0.18);
+  }
+}
+
+@keyframes telemetry-b {
+  0%,
+  38%,
+  100% {
+    opacity: 0.18;
+    background: rgba(44, 44, 48, 0.95);
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.72);
+  }
+  39%,
+  40% {
+    opacity: 1;
+    background: var(--phosphor-amber-hot);
+    box-shadow:
+      2px 0 4px var(--phosphor-amber-dim),
+      -1px 0 3px rgba(255, 186, 56, 0.4);
+  }
+}
+
+@keyframes telemetry-c {
+  0%,
+  24%,
+  86%,
+  100% {
+    opacity: 0.22;
+    background: rgba(44, 44, 48, 0.95);
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.72);
+  }
+  25%,
+  26% {
+    opacity: 0.88;
+    background: var(--phosphor-amber);
+    box-shadow:
+      1px 0 3px var(--phosphor-amber-dim),
+      -0.5px 0 2px rgba(255, 186, 56, 0.32);
+  }
+  87%,
+  88% {
+    opacity: 0.72;
+    background: rgba(255, 186, 56, 0.7);
+    box-shadow:
+      1.5px 0 3px rgba(255, 186, 56, 0.22),
+      -1px 0 2px rgba(255, 186, 56, 0.14);
+  }
+}
+
+@keyframes telemetry-d {
+  0%,
+  52%,
+  100% {
+    opacity: 0.2;
+    background: rgba(44, 44, 48, 0.95);
+    box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.72);
+  }
+  53%,
+  54% {
+    opacity: 0.92;
+    background: var(--phosphor-amber);
+    box-shadow:
+      1.5px 0 3px var(--phosphor-amber-dim),
+      -1px 0 2px rgba(255, 186, 56, 0.3);
+  }
+}
+
+@keyframes boot-scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes boot-progress {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.terminal__workspace {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: opacity 0.25s ease, flex 0.3s ease;
+}
+
+.terminal:not(.terminal--minimized) .terminal__workspace::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 1px;
+  z-index: 20;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 22%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.18) 78%,
+    transparent 100%
+  );
+  opacity: 0.9;
+}
+
+.terminal:not(.terminal--minimized) .terminal__workspace::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      ellipse 88% 72% at 50% 38%,
+      rgba(255, 186, 56, 0.04) 0%,
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      transparent 18%,
+      transparent 72%,
+      rgba(0, 0, 0, 0.18) 100%
+    );
+  box-shadow:
+    inset 0 0 48px rgba(0, 0, 0, 0.22),
+    inset 0 0 96px rgba(0, 0, 0, 0.12);
+  mix-blend-mode: overlay;
+  opacity: 0.85;
+}
+
+.terminal:not(.terminal--minimized) .terminal__workspace {
+  pointer-events: auto;
+}
+
+.terminal--minimized .terminal__workspace {
+  flex: 0 0 0;
+  min-height: 0;
+  max-height: 0;
+  height: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Hide the second glass panel (body) so only the launcher bar shows */
+.terminal--minimized .terminal__layout,
+.terminal--minimized .terminal__body {
+  display: none;
+}
+
+.terminal--minimized [data-gl-panel] {
+  box-shadow:
+    inset 0 1px 0 var(--term-border-hi),
+    0 6px 20px var(--term-shadow);
+}
+
+.terminal--minimized .terminal__titlebar[data-gl-panel] {
+  border-radius: 6px;
+  border: 1px solid var(--term-border-soft);
+}
+
+.terminal__layout {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.terminal__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  border-radius: 0;
+}
+
+.terminal__screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+  transform: translateZ(2px);
+}
+
+.terminal__content-stack {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 22;
+  pointer-events: auto;
+  isolation: isolate;
+}
+
+.terminal:not(.terminal--minimized) .terminal__input-row,
+.terminal:not(.terminal--minimized) .terminal__input-wrap,
+.terminal:not(.terminal--minimized) .terminal__input-line {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.terminal__content-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.terminal__content-reveal__bloom {
+  position: absolute;
+  inset: -5% -12%;
+  background: radial-gradient(
+    ellipse 110% 28% at 50% 0%,
+    rgba(255, 220, 130, 0.2) 0%,
+    rgba(255, 186, 56, 0.07) 38%,
+    transparent 68%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform-origin: 50% 0%;
+  transform: scaleX(1.4) scaleY(0.65);
+  filter: blur(4px);
+}
+
+.terminal__content-reveal__scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  top: -4%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 232, 168, 0.55) 42%,
+    rgba(255, 186, 56, 0.35) 58%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 4px rgba(255, 232, 168, 0.55),
+    2px 0 10px rgba(255, 186, 56, 0.38),
+    -2px 0 8px rgba(255, 186, 56, 0.22),
+    0 1px 14px rgba(255, 186, 56, 0.14);
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.terminal:not(.terminal--minimized) .terminal__screen {
+  margin: 0 9px 9px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.78);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 12%),
+    linear-gradient(0deg, rgba(52, 52, 58, 0.35) 0%, rgba(28, 28, 32, 0.18) 30%, transparent 46%),
+    rgba(0, 0, 0, 0.38);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.08),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.55),
+    inset 0 3px 10px rgba(0, 0, 0, 0.72),
+    inset 0 20px 52px rgba(0, 0, 0, 0.48),
+    inset 0 -6px 16px rgba(255, 255, 255, 0.045),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 0 0 2px rgba(0, 0, 0, 0.65),
+    inset 3px 0 14px rgba(0, 0, 0, 0.22),
+    inset -3px 0 14px rgba(0, 0, 0, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 14px rgba(0, 0, 0, 0.42);
+}
+
+.terminal:not(.terminal--minimized) .terminal__screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      ellipse 40% 18% at 18% 22%,
+      rgba(255, 186, 56, 0.06) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 35% 16% at 82% 78%,
+      rgba(255, 200, 90, 0.04) 0%,
+      transparent 70%
+    );
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+.terminal__output {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 16px 8px;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: var(--term-fg);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.55;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  cursor: default;
+  user-select: text;
+}
+
+.terminal__output:focus {
+  outline: none;
+}
+
+.terminal__history-line {
+  display: block;
+  text-align: left;
+  line-height: 1.55;
+  color: var(--term-fg);
+}
+
+.terminal__input-row {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  min-height: calc(1.55em + 22px);
+  padding: 10px 16px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(
+    180deg,
+    rgba(18, 18, 22, 0.42) 0%,
+    rgba(32, 32, 38, 0.72) 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  text-align: left;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.terminal:not(.terminal--minimized) .terminal__input-row {
+  position: relative;
+  z-index: 3;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    180deg,
+    rgba(38, 38, 44, 0.92) 0%,
+    rgba(48, 48, 54, 0.96) 55%,
+    rgba(52, 52, 58, 0.98) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 8px 20px -8px rgba(255, 255, 255, 0.04);
+}
+
+.terminal:not(.terminal--minimized) .terminal__input-line:not(:focus) {
+  color: rgba(228, 228, 234, 0.94);
+  text-shadow: var(--term-text-glow-dim);
+}
+
+.terminal:not(.terminal--minimized) .terminal__prompt-line:not(:has(.terminal__input-line:focus)) .terminal__chevron--input,
+.terminal:not(.terminal--minimized) .terminal__prompt-line:not(:has(.terminal__input-line:focus)) .terminal__prompt {
+  color: rgba(228, 228, 234, 0.88);
+  text-shadow: var(--term-text-glow-dim);
+}
+
+.terminal__prompt-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 1.55em;
+  line-height: 1.55;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.terminal__input-wrap {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 1.55em;
+  text-align: left;
+}
+
+.terminal__chevron--input {
+  flex-shrink: 0;
+  transform: rotate(0deg);
+  font-size: 1em;
+  line-height: 1.55;
+  vertical-align: baseline;
+}
+
+.terminal__prompt {
+  flex-shrink: 0;
+  user-select: none;
+  line-height: 1.55;
+  vertical-align: baseline;
+}
+
+.terminal__input-line {
+  display: block;
+  width: 100%;
+  height: 1.55em;
+  max-height: 1.55em;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  background: transparent;
+  color: var(--term-dim);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.55;
+  text-align: left;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  cursor: text;
+  caret-color: transparent;
+  text-shadow: none;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.terminal__input-line::-webkit-scrollbar {
+  display: none;
+}
+
+.terminal__input-line:not(:focus) {
+  color: var(--term-dim);
+  text-shadow: none;
+}
+
+.terminal__input-line:focus {
+  outline: none;
+  color: var(--phosphor-amber);
+  text-shadow: var(--term-text-glow-amber);
+}
+
+.terminal__cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: none;
+  margin: 0;
+  padding: 0;
+  color: var(--phosphor-amber-hot);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.55;
+  text-shadow: var(--term-diffuse-cursor);
+  animation: term-blink 0.85s step-end infinite;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.terminal__cursor::after {
+  content: '█';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: transparent;
+  text-shadow:
+    3px 0 8px rgba(255, 200, 90, 0.35),
+    -2px 0 6px rgba(255, 186, 56, 0.22),
+    0 1px 10px rgba(255, 186, 56, 0.18);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.terminal:not(.terminal--minimized) .terminal__cursor--visible {
+  display: block;
+}
+
+/* Glass panels — smoked industrial glass over the display */
+[data-gl-panel] {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 22%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, transparent 18%),
+    var(--term-panel-bg);
+  border: 1px solid transparent;
+  border-image: linear-gradient(
+      168deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.05) 28%,
+      rgba(0, 0, 0, 0.35) 72%,
+      rgba(255, 255, 255, 0.06) 100%
+    )
+    1;
+  box-shadow:
+    inset 0 1px 0 var(--glass-rim-hi),
+    inset 1px 0 0 var(--glass-rim-lo),
+    inset -1px 0 0 rgba(0, 0, 0, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.38),
+    0 4px 0 rgba(0, 0, 0, 0.28),
+    0 10px 32px var(--term-shadow),
+    0 0 14px var(--glass-edge-bloom);
+}
+
+[data-gl-panel]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 32% 26% at 0% 0%, rgba(255, 255, 255, 0.03), transparent 68%),
+    radial-gradient(ellipse 32% 26% at 100% 0%, rgba(255, 255, 255, 0.05), transparent 68%),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent var(--crt-mesh-cell),
+      rgba(255, 255, 255, 0.028) var(--crt-mesh-cell),
+      rgba(255, 255, 255, 0.028) calc(var(--crt-mesh-cell) + 1px)
+    );
+}
+
+[data-gl-panel]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      128deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 36%,
+      transparent 58%,
+      rgba(255, 255, 255, 0.02) 100%
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent var(--crt-pixel),
+      rgba(0, 0, 0, 0.18) var(--crt-pixel),
+      rgba(0, 0, 0, 0.18) calc(var(--crt-pixel) * 2)
+    );
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+}
+
+[data-gl-panel] > * {
+  position: relative;
+  z-index: 1;
+}
+
+.terminal__titlebar[data-gl-panel] {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 22%),
+    linear-gradient(180deg, rgba(36, 36, 40, 0.98) 0%, rgba(24, 24, 28, 0.98) 100%);
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 var(--phosphor-amber-mist),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.18),
+    0 4px 14px rgba(0, 0, 0, 0.28);
+}
+
+.terminal:not(.terminal--minimized) .terminal__titlebar {
+  padding: 0;
+  gap: 0;
+  border-bottom: none;
+  background: transparent;
+  box-shadow: none;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: inherit;
+}
+
+.terminal:not(.terminal--minimized) .terminal__titlebar[data-gl-panel] {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.terminal:not(.terminal--minimized) .terminal__instr {
+  margin: 0 1px;
+  background:
+    linear-gradient(
+      168deg,
+      rgba(22, 22, 26, 0.72) 0%,
+      rgba(10, 10, 12, 0.88) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.terminal:not(.terminal--minimized).terminal--focused .terminal__instr {
+  background:
+    linear-gradient(
+      168deg,
+      rgba(28, 26, 22, 0.82) 0%,
+      rgba(12, 11, 10, 0.92) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(255, 186, 56, 0.05),
+    0 0 18px rgba(255, 186, 56, 0.04);
+}
+
+.terminal__body[data-gl-panel] {
+  border-top: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, transparent 12%),
+    var(--term-panel-bg);
+  transform: translateZ(1px);
+}
+
+.terminal:not(.terminal--minimized) .terminal__body[data-gl-panel] {
+  border-radius: 0 0 4px 4px;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, rgba(0, 0, 0, 0.08) 10%, transparent 20%),
+    linear-gradient(180deg, rgba(20, 20, 24, 0.98) 0%, rgba(14, 14, 16, 0.99) 100%);
+  box-shadow:
+    inset 0 14px 32px rgba(0, 0, 0, 0.45),
+    inset 0 2px 0 rgba(255, 255, 255, 0.05),
+    inset 0 0 48px rgba(0, 0, 0, 0.28),
+    inset 5px 0 18px rgba(0, 0, 0, 0.18),
+    inset -5px 0 18px rgba(0, 0, 0, 0.18);
+}
+
+@keyframes term-blink {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.terminal--minimized .terminal__titlebar {
+  animation: crt-content-nudge 0.11s steps(4) infinite;
+}
+
+.terminal:not(.terminal--minimized) .terminal__titlebar,
+.terminal:not(.terminal--minimized) .terminal__workspace,
+.terminal:not(.terminal--minimized) .terminal__screen {
+  animation: none;
+}
+

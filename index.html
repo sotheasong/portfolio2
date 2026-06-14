@@ -2,23 +2,208 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ARCHIVE // SIGNAL FIELD</title>
-    <link rel="stylesheet" href="src/css/global.css" />
+    <title>Signal field</title>
+    <link rel="preconnect" href="https://fonts.cdnfonts.com" crossorigin />
+    <link href="https://fonts.cdnfonts.com/css/eurostile" rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/main.css" />
   </head>
-  <body>
-    <canvas id="canvas"></canvas>
-
-    <!-- Persistent system HUD -->
-    <div id="sys-hud">
-      <div class="sys-hud-line sys-hud-line--accent">SIGNAL FIELD ACTIVE</div>
-      <div class="sys-hud-line sys-clock-hud"></div>
-      <div class="sys-hud-line">ENV_VER 2.4.1</div>
+  <body class="boot-screen-active">
+    <div id="boot-screen" class="boot-screen boot-screen--p1" aria-live="polite">
+      <div class="boot-screen__fx" aria-hidden="true">
+        <div class="boot-screen__noise"></div>
+        <div class="boot-screen__scanlines-outer"></div>
+        <div class="boot-screen__vignette-outer"></div>
+        <div class="boot-screen__flicker-outer"></div>
+        <div class="boot-screen__sync-beam"></div>
+        <div class="boot-screen__handoff-beam"></div>
+        <div class="boot-screen__wash"></div>
+      </div>
+      <div class="boot-screen__chassis">
+        <div class="boot-screen__bezel" aria-hidden="true">
+          <div class="boot-screen__bezel__vignette"></div>
+          <div class="boot-screen__bezel__pressure"></div>
+          <div class="boot-screen__bezel__rim"></div>
+        </div>
+        <div class="boot-screen__viewport">
+          <div class="boot-screen__crt" aria-hidden="true">
+            <div class="boot-screen__crt-jitter">
+              <div class="boot-screen__phosphor"></div>
+              <div class="boot-screen__scanlines"></div>
+              <div class="boot-screen__bloom">
+                <div class="boot-screen__diffuse boot-screen__diffuse--h"></div>
+                <div class="boot-screen__diffuse boot-screen__diffuse--v"></div>
+                <div class="boot-screen__diffuse boot-screen__diffuse--accent"></div>
+              </div>
+              <div class="boot-screen__vignette"></div>
+              <div class="boot-screen__curvature"></div>
+              <div class="boot-screen__chroma"></div>
+              <div class="boot-screen__crt-noise"></div>
+              <div class="boot-screen__flicker"></div>
+              <div class="boot-screen__roll"></div>
+              <div class="boot-screen__glass"></div>
+            </div>
+          </div>
+          <div class="boot-screen__shell-wear" aria-hidden="true"></div>
+          <div class="boot-screen__content">
+            <ul class="boot-screen__lamps" aria-hidden="true">
+          <li class="boot-screen__lamp boot-screen__lamp--signal">SIG</li>
+          <li class="boot-screen__lamp boot-screen__lamp--sync">SYN</li>
+          <li class="boot-screen__lamp boot-screen__lamp--scan">SCN</li>
+        </ul>
+        <div class="boot-screen__log" id="boot-screen-log"></div>
+        <div class="boot-screen__identity">
+          <div class="boot-screen__id-row">
+            <span class="boot-screen__id-key">OPERATOR</span>
+            <span class="boot-screen__id-val" id="boot-screen-operator"></span>
+          </div>
+          <div class="boot-screen__id-row">
+            <span class="boot-screen__id-key">NODE</span>
+            <span class="boot-screen__id-val" id="boot-screen-node"></span>
+          </div>
+        </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <main id="workspace"></main>
+    <canvas id="canvas"></canvas>
 
+    <div class="terminal terminal--minimized" id="portfolio-terminal" aria-label="Portfolio terminal">
+      <div class="terminal__crt">
+        <div class="terminal__shell" data-gl-window>
+          <div class="terminal__shell-material" aria-hidden="true"></div>
+          <div class="terminal__titlebar" data-gl-panel>
+            <div class="terminal__bar-fx" aria-hidden="true">
+              <div class="terminal__bar-fx__refraction"></div>
+              <div class="terminal__bar-fx__scanlines"></div>
+              <div class="terminal__bar-fx__flicker"></div>
+            </div>
+            <div class="terminal__signal-unlock" aria-hidden="true"></div>
+            <button
+              type="button"
+              class="terminal__open"
+              id="terminal-open"
+              aria-expanded="false"
+              aria-controls="terminal-workspace"
+            >
+              <span class="terminal__chevron" aria-hidden="true">›</span>
+              <span class="terminal__open-prompt">$</span>
+              <span class="terminal__open-cursor" aria-hidden="true">█</span>
+              <span class="terminal__sr-only">Open terminal</span>
+            </button>
+            <div class="terminal__expanded-head">
+              <div class="terminal__instr" aria-label="System instrumentation">
+                <div class="terminal__instr__glass" aria-hidden="true">
+                  <div class="terminal__instr__sheen"></div>
+                  <div class="terminal__instr__bevel"></div>
+                  <div class="terminal__instr__pool"></div>
+                  <div class="terminal__instr__compress"></div>
+                  <div class="terminal__instr__shade"></div>
+                </div>
+                <div class="terminal__instr__zone terminal__instr__zone--id">
+                  <span class="terminal__instr__mark" aria-hidden="true">›</span>
+                  <span class="terminal__instr__id">sothea</span>
+                  <span class="terminal__path terminal__instr__node">~/portfolio</span>
+                </div>
+                <div class="terminal__instr__zone terminal__instr__zone--signal" aria-hidden="true">
+                  <div class="terminal__signal-pulse">
+                    <span class="terminal__signal-pulse__track"></span>
+                    <span class="terminal__signal-pulse__core"></span>
+                  </div>
+                  <div class="terminal__status">
+                    <div class="terminal__telemetry" role="img" aria-label="System telemetry">
+                      <span class="terminal__telemetry__cell terminal__telemetry__cell--a"></span>
+                      <span class="terminal__telemetry__cell terminal__telemetry__cell--b"></span>
+                      <span class="terminal__telemetry__cell terminal__telemetry__cell--c"></span>
+                      <span class="terminal__telemetry__cell terminal__telemetry__cell--d"></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="terminal__instr__zone terminal__instr__zone--ops">
+                  <span class="terminal__hint" id="terminal-hint">
+                    <kbd class="terminal__hint-key">esc</kbd>
+                    <span class="terminal__hint-label">min</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal__workspace" id="terminal-workspace" aria-hidden="true">
+            <div class="terminal__boot" aria-hidden="true">
+              <div class="terminal__boot-scan"></div>
+              <div class="terminal__boot-bar"><span class="terminal__boot-fill"></span></div>
+            </div>
+            <div class="terminal__layout">
+              <main class="terminal__body" data-gl-panel>
+                <div class="terminal__screen">
+                  <div class="terminal__content-reveal" aria-hidden="true">
+                    <div class="terminal__content-reveal__bloom"></div>
+                    <div class="terminal__content-reveal__scan"></div>
+                  </div>
+                  <div class="terminal__content-stack">
+                    <div
+                      id="terminal-output"
+                      class="terminal__output"
+                      aria-label="Terminal output"
+                      tabindex="-1"
+                    ></div>
+                  <div class="terminal__input-row">
+                    <div class="terminal__prompt-line">
+                      <span class="terminal__chevron terminal__chevron--input" aria-hidden="true">›</span>
+                      <span class="terminal__prompt" aria-hidden="true">$</span>
+                      <div class="terminal__input-wrap">
+                      <div
+                        id="terminal-input"
+                        class="terminal__input-line terminal__input-line--hint"
+                        contenteditable="true"
+                        spellcheck="false"
+                        role="textbox"
+                        aria-label="Command input"
+                        data-placeholder="type help for commands"
+                        tabindex="0"
+                      ></div>
+                        <span class="terminal__cursor" id="terminal-cursor" aria-hidden="true">█</span>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              </main>
+            </div>
+
+            <div class="terminal__crt-fx" aria-hidden="true">
+              <div class="terminal__crt-fx__glass" aria-hidden="true"></div>
+              <div class="terminal__crt-fx__jitter">
+                <div class="terminal__crt-fx__scanlines"></div>
+                <div class="terminal__crt-fx__bloom">
+                  <div class="terminal__crt-fx__diffuse terminal__crt-fx__diffuse--h"></div>
+                  <div class="terminal__crt-fx__diffuse terminal__crt-fx__diffuse--v"></div>
+                  <div class="terminal__crt-fx__diffuse terminal__crt-fx__diffuse--accent"></div>
+                </div>
+                <div class="terminal__crt-fx__phosphor"></div>
+                <div class="terminal__crt-fx__vignette"></div>
+                <div class="terminal__crt-fx__curvature"></div>
+                <div class="terminal__crt-fx__flicker"></div>
+                <div class="terminal__crt-fx__noise"></div>
+                <div class="terminal__crt-fx__roll"></div>
+                <div class="terminal__crt-fx__chroma"></div>
+                <div class="terminal__crt-fx__glitchbars"></div>
+              </div>
+            </div>
+            <div class="terminal__bezel" aria-hidden="true">
+              <div class="terminal__bezel__vignette"></div>
+              <div class="terminal__bezel__pressure"></div>
+              <div class="terminal__bezel__thickness"></div>
+              <div class="terminal__bezel__rim"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="float-layer" id="float-layer" aria-live="polite"></div>
     <script type="module" src="src/js/index.js"></script>
   </body>
 </html>

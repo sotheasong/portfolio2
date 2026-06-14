@@ -1,0 +1,601 @@
+.terminal {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  pointer-events: none;
+  transition: align-items 0.3s ease, justify-content 0.3s ease, padding 0.3s ease;
+}
+
+.terminal:not(.terminal--minimized) {
+  align-items: center;
+  justify-content: center;
+  padding: clamp(4px, 0.8vmin, 10px);
+  box-sizing: border-box;
+  perspective: 1100px;
+  perspective-origin: 50% 42%;
+}
+
+.terminal:not(.terminal--minimized) .terminal__crt {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: min(70vw, 1200px);
+  height: min(70vh, 900px);
+  max-width: 70vw;
+  max-height: 70vh;
+  overflow: visible;
+}
+
+.terminal--minimized {
+  align-items: center;
+  justify-content: center;
+  padding: clamp(4px, 0.8vmin, 10px);
+  perspective: 900px;
+  perspective-origin: 50% 42%;
+}
+
+.terminal--minimized .terminal__crt {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+}
+
+.terminal__crt {
+  position: relative;
+  pointer-events: auto;
+  display: block;
+  transform-style: preserve-3d;
+}
+
+/* Chassis back plate — sits behind the glass shell in 3D */
+.terminal__crt::before {
+  content: '';
+  position: absolute;
+  inset: -10px -12px -14px;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 0;
+  transform: translateZ(-28px) rotateX(3.5deg);
+  transform-origin: 50% 100%;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.06) 0%, transparent 38%),
+    linear-gradient(
+      168deg,
+      rgba(48, 48, 54, 0.95) 0%,
+      rgba(22, 22, 26, 0.98) 38%,
+      rgba(8, 8, 10, 1) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -3px 8px rgba(0, 0, 0, 0.55),
+    inset 1px 0 0 rgba(255, 255, 255, 0.04),
+    0 28px 64px rgba(0, 0, 0, 0.62),
+    0 8px 20px rgba(0, 0, 0, 0.45),
+    0 0 24px rgba(255, 255, 255, 0.03);
+}
+
+/* Contact shadow on the “surface” behind the monitor */
+.terminal__crt::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -22px;
+  height: 28px;
+  pointer-events: none;
+  z-index: 0;
+  transform: translateZ(-40px) rotateX(88deg);
+  transform-origin: 50% 0%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.22) 45%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  opacity: 0.85;
+}
+
+.terminal--minimized .terminal__crt::before {
+  inset: -6px -8px -10px;
+  transform: translateZ(-14px) rotateX(5deg);
+  border-radius: 8px;
+}
+
+.terminal--minimized .terminal__crt::after {
+  bottom: -14px;
+  height: 18px;
+  opacity: 0.65;
+}
+
+.terminal__shell {
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  font-family: var(--font-ui);
+  color: var(--term-fg);
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: clamp(11px, 1.05vw, 14px);
+  transform-style: preserve-3d;
+  transform-origin: 50% 42%;
+  transition:
+    max-height 0.32s ease,
+    width 0.32s ease,
+    transform 0.14s ease-out,
+    box-shadow 0.32s ease;
+  filter: contrast(1.1) saturate(0.95);
+  background-color: var(--glass-smoke-deep);
+  background-image:
+    linear-gradient(
+      125deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.01) 18%,
+      transparent 42%
+    ),
+    linear-gradient(
+      168deg,
+      var(--glass-smoke-top) 0%,
+      var(--glass-smoke-mid) 44%,
+      var(--glass-smoke-deep) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 var(--glass-rim-hi),
+    inset 1px 0 0 var(--glass-rim-lo),
+    inset -1px 0 0 rgba(0, 0, 0, 0.28),
+    inset 0 -2px 0 var(--glass-edge-dark),
+    inset 0 0 56px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.72),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 2px 0 var(--glass-rim-lo),
+    0 0 18px var(--glass-edge-bloom);
+  animation: crt-shell-brightness 0.11s steps(4) infinite;
+  isolation: isolate;
+}
+
+/* Beveled glass rim — corner highlights + internal reflection */
+.terminal__shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 55;
+  background:
+    radial-gradient(ellipse 28% 22% at 0% 0%, rgba(255, 255, 255, 0.06), transparent 68%),
+    radial-gradient(ellipse 28% 24% at 100% 0%, rgba(255, 255, 255, 0.1), transparent 70%),
+    radial-gradient(ellipse 22% 18% at 100% 100%, rgba(255, 255, 255, 0.05), transparent 68%),
+    radial-gradient(ellipse 18% 14% at 0% 100%, rgba(255, 255, 255, 0.03), transparent 65%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 10%,
+      transparent 32%,
+      transparent 72%,
+      rgba(0, 0, 0, 0.22) 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px var(--glass-rim-mid),
+    inset 1px 1px 0 var(--glass-rim-hi),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.38),
+    inset 0 2px 8px rgba(255, 255, 255, 0.03),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.28);
+}
+
+/* Bottom chin + edge bloom along lower bezel */
+.terminal__shell::after {
+  content: '';
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 0;
+  height: 7px;
+  pointer-events: none;
+  z-index: 56;
+  border-radius: 0 0 5px 5px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.03) 28%,
+    rgba(0, 0, 0, 0.65) 100%
+  );
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 0 12px rgba(255, 255, 255, 0.04);
+  opacity: 0.95;
+}
+
+.terminal:not(.terminal--minimized) .terminal__shell {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  font-size: clamp(14.5px, calc(1.05vw * var(--term-content-zoom)), 18.5px);
+  transform: rotateX(var(--term-tilt-x)) rotateY(var(--term-tilt-y)) translateZ(var(--term-lift-z));
+  transform-origin: 50% 42%;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.14s ease-out,
+    box-shadow 0.35s ease;
+  will-change: transform;
+  background-image:
+    linear-gradient(
+      128deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.02) 20%,
+      transparent 46%
+    ),
+    linear-gradient(
+      212deg,
+      rgba(255, 186, 56, 0.04) 0%,
+      transparent 38%
+    ),
+    linear-gradient(
+      168deg,
+      rgba(34, 34, 38, 0.99) 0%,
+      rgba(22, 22, 26, 0.98) 46%,
+      rgba(10, 10, 12, 1) 100%
+    );
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.16),
+    inset 2px 0 0 rgba(255, 255, 255, 0.07),
+    inset -2px 0 0 rgba(0, 0, 0, 0.42),
+    inset 0 -5px 0 rgba(0, 0, 0, 0.62),
+    inset 0 0 88px rgba(0, 0, 0, 0.52),
+    inset 0 0 148px rgba(0, 0, 0, 0.32),
+    inset 0 28px 72px rgba(255, 186, 56, 0.035),
+    inset 0 0 56px var(--phosphor-amber-mist),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.88),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.04),
+    0 0 0 1px rgba(0, 0, 0, 0.9),
+    0 0 0 2px rgba(255, 255, 255, 0.045),
+    0 0 0 3px rgba(0, 0, 0, 0.35),
+    0 4px 0 rgba(255, 255, 255, 0.06),
+    0 0 24px rgba(255, 255, 255, 0.04),
+    0 22px 48px rgba(0, 0, 0, 0.56),
+    0 52px 104px rgba(0, 0, 0, 0.44);
+  filter: contrast(1.1) saturate(0.94) brightness(0.99);
+}
+
+.terminal:not(.terminal--minimized):not(.terminal--opening):not(.terminal--closing)
+  .terminal__shell {
+  animation: expanded-luminance-pulse 6.8s ease-in-out infinite;
+}
+
+.terminal:not(.terminal--minimized) .terminal__shell::before {
+  background:
+    radial-gradient(ellipse 34% 30% at 0% 0%, rgba(255, 255, 255, 0.11), transparent 74%),
+    radial-gradient(ellipse 34% 30% at 100% 0%, rgba(255, 255, 255, 0.13), transparent 74%),
+    radial-gradient(ellipse 26% 20% at 100% 100%, rgba(255, 255, 255, 0.06), transparent 70%),
+    radial-gradient(ellipse 22% 16% at 0% 100%, rgba(255, 255, 255, 0.04), transparent 68%),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.06) 5%,
+      rgba(255, 255, 255, 0.02) 10%,
+      transparent 22%,
+      transparent 68%,
+      rgba(0, 0, 0, 0.28) 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.1),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.42),
+    inset 0 4px 14px rgba(255, 255, 255, 0.04),
+    inset 0 -8px 22px rgba(0, 0, 0, 0.38),
+    inset 5px 0 16px rgba(0, 0, 0, 0.14),
+    inset -5px 0 16px rgba(0, 0, 0, 0.14);
+}
+
+.terminal:not(.terminal--minimized):not(.terminal--opening):not(.terminal--closing)
+  .terminal__shell::before {
+  animation: expanded-reflection-drift 13s ease-in-out infinite;
+}
+
+.terminal:not(.terminal--minimized) .terminal__shell::after {
+  left: 2%;
+  right: 2%;
+  height: 11px;
+  opacity: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.04) 22%,
+    rgba(0, 0, 0, 0.55) 72%,
+    rgba(0, 0, 0, 0.78) 100%
+  );
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.07),
+    0 0 16px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.terminal__shell-material {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 54;
+  pointer-events: none;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.terminal:not(.terminal--minimized) .terminal__shell-material {
+  display: block;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.11) 0%,
+      rgba(255, 255, 255, 0.04) 4%,
+      transparent 14%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.22) 0%,
+      transparent 6%,
+      transparent 94%,
+      rgba(0, 0, 0, 0.22) 100%
+    );
+  box-shadow:
+    inset 0 10px 28px -6px rgba(255, 255, 255, 0.06),
+    inset 0 -16px 40px rgba(0, 0, 0, 0.28);
+  opacity: 0.92;
+}
+
+.terminal:not(.terminal--minimized):not(.terminal--opening):not(.terminal--closing)
+  .terminal__shell-material {
+  animation: expanded-reflection-drift 15s ease-in-out infinite reverse;
+}
+
+.terminal:not(.terminal--minimized) .terminal__crt::before {
+  inset: -12px -14px -18px;
+  transform: translateZ(-32px) rotateX(4deg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.58),
+    inset 2px 0 0 rgba(255, 255, 255, 0.05),
+    0 32px 72px rgba(0, 0, 0, 0.65),
+    0 12px 28px rgba(0, 0, 0, 0.48),
+    0 0 28px rgba(255, 255, 255, 0.035);
+}
+
+.terminal:not(.terminal--minimized) .terminal__crt::after {
+  bottom: -20px;
+  height: 26px;
+  opacity: 0.8;
+  filter: blur(7px);
+}
+
+/* Sealed industrial bezel — maximized display frame only */
+.terminal__bezel {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 14;
+  pointer-events: none;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.terminal__bezel * {
+  pointer-events: none;
+}
+
+.terminal:not(.terminal--minimized) .terminal__bezel {
+  display: block;
+}
+
+.terminal__bezel__vignette {
+  position: absolute;
+  inset: -2%;
+  background:
+    radial-gradient(
+      ellipse 80% 68% at 50% 40%,
+      transparent 32%,
+      rgba(0, 0, 0, 0.14) 58%,
+      rgba(0, 0, 0, 0.42) 86%,
+      rgba(0, 0, 0, 0.52) 100%
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.38) 0%, transparent 8%, transparent 92%, rgba(0, 0, 0, 0.38) 100%),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.22) 0%,
+      transparent 10%,
+      transparent 92%,
+      rgba(0, 0, 0, 0.18) 100%
+    );
+  mix-blend-mode: multiply;
+  opacity: 0.82;
+  mask-image: linear-gradient(180deg, #000 0%, #000 68%, rgba(0, 0, 0, 0.35) 82%, transparent 90%);
+}
+
+.terminal__bezel__pressure {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      ellipse 92% 76% at 50% 40%,
+      transparent 54%,
+      rgba(0, 0, 0, 0.06) 72%,
+      rgba(0, 0, 0, 0.16) 88%,
+      rgba(0, 0, 0, 0.22) 100%
+    );
+  box-shadow:
+    inset 0 0 64px 18px rgba(0, 0, 0, 0.32),
+    inset 0 0 100px 38px rgba(0, 0, 0, 0.16);
+  opacity: 0.85;
+  mask-image: linear-gradient(180deg, #000 0%, #000 66%, transparent 86%);
+}
+
+.terminal:not(.terminal--minimized):not(.terminal--opening):not(.terminal--closing)
+  .terminal__bezel__pressure {
+  animation: bezel-pressure-breathe 14s ease-in-out infinite;
+}
+
+.terminal__bezel__thickness {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.38) 0%, rgba(0, 0, 0, 0.12) 2.5%, transparent 5%),
+    linear-gradient(270deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.14) 2.5%, transparent 5%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 3.5%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.06) 3%, transparent 6%);
+  opacity: 0.75;
+  mix-blend-mode: overlay;
+  mask-image: linear-gradient(180deg, #000 0%, #000 72%, transparent 88%);
+}
+
+.terminal__bezel__rim {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.16),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.82),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.035);
+  background:
+    linear-gradient(
+      152deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.05) 6%,
+      transparent 14%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 3%,
+      transparent 8%,
+      transparent 94%,
+      rgba(0, 0, 0, 0.18) 97%,
+      rgba(0, 0, 0, 0.22) 100%
+    );
+  opacity: 0.88;
+  mask-image: linear-gradient(180deg, #000 0%, #000 74%, transparent 90%);
+}
+
+@keyframes bezel-pressure-breathe {
+  0%,
+  100% {
+    opacity: 0.88;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.terminal--minimized .terminal__shell {
+  --term-tilt-x: 5deg;
+  --term-lift-z: 10px;
+  width: min(52vw, 380px);
+  height: auto;
+  max-height: none;
+  font-size: clamp(10px, 0.95vw, 12px);
+  background-image:
+    linear-gradient(125deg, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
+    linear-gradient(180deg, rgba(28, 28, 32, 0.98), rgba(18, 18, 20, 0.98));
+  transform: rotateX(var(--term-tilt-x)) rotateY(var(--term-tilt-y)) translateZ(var(--term-lift-z));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 1px 0 0 rgba(255, 255, 255, 0.04),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    inset 0 0 24px rgba(0, 0, 0, 0.35),
+    0 0 16px rgba(255, 255, 255, 0.03),
+    0 10px 28px rgba(0, 0, 0, 0.48),
+    0 22px 48px rgba(0, 0, 0, 0.32);
+  cursor: pointer;
+  transition:
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+}
+
+.terminal--minimized .terminal__shell:hover {
+  box-shadow:
+    inset 0 0 20px var(--phosphor-amber-mist),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 10px 28px rgba(0, 0, 0, 0.48),
+    0 22px 48px rgba(0, 0, 0, 0.32);
+}
+
+/* Minimized idle — phosphor micro-motion (off during open / close) */
+.terminal--minimized:not(.terminal--opening):not(.terminal--closing) .terminal__shell {
+  animation: mini-luminance-pulse 5.2s ease-in-out infinite;
+}
+
+.terminal--minimized:not(.terminal--opening):not(.terminal--closing) .terminal__shell::before {
+  animation: mini-reflection-drift 11s ease-in-out infinite;
+}
+
+.terminal--minimized:not(.terminal--opening):not(.terminal--closing) .terminal__open-cursor {
+  animation:
+    term-blink 0.85s step-end infinite,
+    mini-cursor-bloom 3.4s ease-in-out infinite;
+}
+
+.terminal--minimized:not(.terminal--opening):not(.terminal--closing) .terminal__bar-fx {
+  opacity: 1;
+}
+
+.terminal--minimized:not(.terminal--opening):not(.terminal--closing) .terminal__bar-fx__scanlines {
+  animation: mini-bar-scan-pulse 6s ease-in-out infinite;
+}
+
+.terminal--minimized:not(.terminal--opening):not(.terminal--closing) .terminal__bar-fx__refraction {
+  opacity: 0.042;
+  animation: mini-noise-refract 0.38s steps(3) infinite;
+}
+
+.terminal__titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.88em;
+  border-bottom: 1px solid var(--term-border-soft);
+  position: relative;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.terminal--minimized .terminal__titlebar {
+  padding: 8px 14px;
+  border-bottom: none;
+  justify-content: space-between;
+}
+
+.terminal--minimized .terminal__open {
+  justify-content: flex-start;
+  width: 100%;
+  gap: 0.65rem;
+}
+
+.terminal__expanded-head {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+

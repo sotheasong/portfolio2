@@ -1,0 +1,738 @@
+/* ── Open sequence: signal wake → frame expansion → signal resolution ── */
+.terminal--opening,
+.terminal--closing {
+  pointer-events: none;
+}
+
+/* Phase 2–4: full chassis geometry while class minimized is still on */
+.terminal--opening-p2.terminal--minimized,
+.terminal--opening-p3.terminal--minimized,
+.terminal--opening-p4.terminal--minimized {
+  align-items: center;
+  justify-content: center;
+  padding: clamp(4px, 0.8vmin, 10px);
+  perspective: 1100px;
+  perspective-origin: 50% 42%;
+}
+
+.terminal--opening-p2.terminal--minimized .terminal__crt,
+.terminal--opening-p3.terminal--minimized .terminal__crt,
+.terminal--opening-p4.terminal--minimized .terminal__crt {
+  flex: none;
+  width: min(70vw, 1200px);
+  height: min(70vh, 900px);
+  max-width: 70vw;
+  max-height: 70vh;
+  overflow: hidden;
+}
+
+.terminal--opening-p2.terminal--minimized .terminal__shell,
+.terminal--opening-p3.terminal--minimized .terminal__shell,
+.terminal--opening-p4.terminal--minimized .terminal__shell {
+  --term-tilt-x: 1.6deg;
+  --term-lift-z: 18px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  font-size: clamp(14.5px, calc(1.05vw * var(--term-content-zoom)), 18.5px);
+}
+
+.terminal--opening-p2.terminal--minimized .terminal__open,
+.terminal--opening-p3.terminal--minimized .terminal__open,
+.terminal--opening-p4.terminal--minimized .terminal__open {
+  display: none;
+}
+
+.terminal--opening-p2.terminal--minimized .terminal__expanded-head,
+.terminal--opening-p3.terminal--minimized .terminal__expanded-head,
+.terminal--opening-p4.terminal--minimized .terminal__expanded-head {
+  display: flex;
+}
+
+.terminal--opening-p2.terminal--minimized .terminal__layout,
+.terminal--opening-p2.terminal--minimized .terminal__body,
+.terminal--opening-p3.terminal--minimized .terminal__layout,
+.terminal--opening-p3.terminal--minimized .terminal__body,
+.terminal--opening-p4.terminal--minimized .terminal__layout,
+.terminal--opening-p4.terminal--minimized .terminal__body {
+  display: flex;
+}
+
+.terminal--opening-p2.terminal--minimized .terminal__workspace,
+.terminal--opening-p3.terminal--minimized .terminal__workspace,
+.terminal--opening-p4.terminal--minimized .terminal__workspace {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  visibility: visible;
+  pointer-events: none;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* Titlebar signal overlays */
+.terminal__bar-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 52;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.terminal__bar-fx__scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.34) 0,
+    rgba(0, 0, 0, 0.34) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+}
+
+.terminal__bar-fx__flicker {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 186, 56, 0.06);
+  mix-blend-mode: overlay;
+  opacity: 0;
+}
+
+.terminal__bar-fx__refraction {
+  position: absolute;
+  inset: -3px;
+  z-index: 0;
+  opacity: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' seed='31' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  mix-blend-mode: soft-light;
+  transform: scaleX(1.15);
+  opacity: 0.9;
+}
+
+.terminal__signal-unlock {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 110;
+  width: 0;
+  height: 1px;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 186, 56, 0.15) 12%,
+    rgba(255, 220, 120, 0.95) 50%,
+    rgba(255, 186, 56, 0.15) 88%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 6px rgba(255, 186, 56, 0.45),
+    0 0 14px rgba(255, 186, 56, 0.22);
+}
+
+/* ── Phase 1: signal wake (launcher bar) ── */
+.terminal--opening-p1 .terminal__bar-fx {
+  opacity: 1;
+}
+
+.terminal--opening-p1 .terminal__bar-fx__scanlines {
+  animation: signal-bar-scan 0.22s ease-out forwards;
+}
+
+.terminal--opening-p1 .terminal__bar-fx__flicker {
+  animation: signal-bar-flicker 0.22s steps(4, end) forwards;
+}
+
+.terminal--opening-p1 .terminal__open-cursor {
+  animation:
+    signal-cursor-wake 0.22s ease-out forwards,
+    term-blink 0.85s step-end 0.22s infinite;
+}
+
+.terminal--opening-p1.terminal--minimized .terminal__shell {
+  animation: signal-shell-prime 0.22s ease-out forwards;
+}
+
+.terminal--opening-p1 .terminal__signal-unlock {
+  animation: signal-unlock-line 0.16s 0.08s var(--ease-mass) forwards;
+}
+
+.terminal--opening-p1 .terminal__workspace {
+  flex: 0 0 0;
+  min-height: 0;
+  max-height: 0;
+  height: 0;
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+}
+
+/* Interior scans in with frame expansion (phase 2) — no empty void */
+.terminal--opening-p2 .terminal__content-reveal {
+  opacity: 1;
+}
+
+.terminal--opening-p2 .terminal__content-reveal__scan {
+  animation: reveal-scan-beam 0.36s var(--ease-mass) 0.14s forwards;
+}
+
+.terminal--opening-p2 .terminal__content-reveal__bloom {
+  animation: reveal-phosphor-bloom 0.36s var(--ease-decay) 0.1s forwards;
+}
+
+.terminal--opening-p2 .terminal__content-stack {
+  visibility: visible;
+  pointer-events: none;
+  animation: content-luminance-scan 0.4s var(--ease-mass) 0.08s forwards;
+}
+
+.terminal--opening-p2 .terminal__input-row {
+  opacity: 0;
+  animation: content-line-in 0.28s var(--ease-mass) 0.22s forwards;
+}
+
+/* ── Phase 2: asymmetric frame expansion (chassis only) ── */
+.terminal--opening-p2 .terminal__crt {
+  transform-origin: 50% 0%;
+  will-change: clip-path, transform;
+  animation: signal-frame-expand 0.42s var(--ease-mass) forwards;
+}
+
+.terminal--opening-p2 .terminal__shell {
+  transform-origin: 50% 0%;
+  will-change: clip-path, transform, box-shadow;
+  animation: signal-shell-unfold 0.42s var(--ease-mass) forwards;
+}
+
+.terminal--opening-p2 .terminal__workspace {
+  animation: signal-workspace-rise 0.42s 0.05s var(--ease-decay) forwards;
+}
+
+.terminal--opening-p2 .terminal__crt-fx__glass {
+  animation: signal-glass-draw 0.42s var(--ease-decay) forwards;
+}
+
+/* ── Phase 4: settle (content already visible from phase 2) ── */
+.terminal--opening-p4 .terminal__content-stack {
+  visibility: visible;
+  pointer-events: auto;
+  animation: content-stack-settle 0.22s var(--ease-decay) forwards;
+}
+
+.terminal--opening-p4 .terminal__crt-fx__bloom {
+  animation: reveal-panel-bloom 0.28s var(--ease-decay) forwards;
+}
+
+.terminal--opening-p4 .terminal__crt-fx__scanlines {
+  animation: crt-scan-drift 8s linear infinite;
+}
+
+.terminal--closing .terminal__shell {
+  animation: term-close-content 0.3s ease-in forwards;
+}
+
+@keyframes expanded-luminance-pulse {
+  0%,
+  100% {
+    filter: contrast(1.1) saturate(0.94) brightness(0.985);
+  }
+  50% {
+    filter: contrast(1.11) saturate(0.96) brightness(1.022);
+  }
+}
+
+@keyframes expanded-reflection-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.9;
+  }
+  33% {
+    transform: translate3d(2px, -0.5px, 0);
+    opacity: 0.97;
+  }
+  66% {
+    transform: translate3d(-1.5px, 0.4px, 0);
+    opacity: 0.93;
+  }
+}
+
+@keyframes mini-luminance-pulse {
+  0%,
+  100% {
+    filter: contrast(1.08) saturate(0.93) brightness(0.985);
+  }
+  50% {
+    filter: contrast(1.1) saturate(0.96) brightness(1.028);
+  }
+}
+
+@keyframes mini-reflection-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.9;
+  }
+  35% {
+    transform: translate3d(1.5px, -0.4px, 0);
+    opacity: 0.97;
+  }
+  68% {
+    transform: translate3d(-1px, 0.35px, 0);
+    opacity: 0.93;
+  }
+}
+
+@keyframes mini-cursor-bloom {
+  0%,
+  100% {
+    text-shadow:
+      var(--diffuse-core) rgba(255, 255, 255, 0.85),
+      1px 0 4px rgba(255, 186, 56, 0.32),
+      -0.5px 0 3px rgba(255, 186, 56, 0.2);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow:
+      var(--diffuse-core) rgba(255, 248, 228, 0.95),
+      2px 0 6px rgba(255, 200, 90, 0.55),
+      -1px 0 5px rgba(255, 186, 56, 0.38),
+      3px 0.5px 12px rgba(255, 186, 56, 0.22);
+    filter: brightness(1.1);
+  }
+}
+
+@keyframes mini-bar-scan-pulse {
+  0%,
+  100% {
+    opacity: 0.34;
+  }
+  50% {
+    opacity: 0.48;
+  }
+}
+
+@keyframes mini-noise-refract {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0.038;
+  }
+  33% {
+    transform: translate(-0.6%, 0.45%);
+    opacity: 0.05;
+  }
+  66% {
+    transform: translate(0.5%, -0.35%);
+    opacity: 0.041;
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.038;
+  }
+}
+
+@keyframes signal-cursor-wake {
+  0% {
+    color: var(--term-fg);
+    text-shadow: var(--term-text-glow);
+    filter: brightness(1);
+  }
+  40% {
+    color: var(--phosphor-amber-hot);
+    text-shadow:
+      var(--diffuse-core) rgba(255, 252, 240, 1),
+      2px 0 6px rgba(255, 200, 90, 0.75),
+      -1px 0 5px rgba(255, 186, 56, 0.5),
+      3px 0.5px 14px rgba(255, 186, 56, 0.28);
+    filter: brightness(1.45);
+  }
+  100% {
+    color: var(--phosphor-amber-hot);
+    text-shadow:
+      var(--diffuse-core) rgba(255, 248, 228, 0.95),
+      1.5px 0 5px rgba(255, 186, 56, 0.55),
+      -1px 0 4px rgba(255, 186, 56, 0.35);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes signal-bar-scan {
+  0% {
+    opacity: 0.32;
+  }
+  100% {
+    opacity: 0.72;
+  }
+}
+
+@keyframes signal-bar-flicker {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.18;
+  }
+  75% {
+    opacity: 0.42;
+  }
+}
+
+@keyframes signal-shell-prime {
+  0% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.11),
+      inset 1px 0 0 rgba(255, 255, 255, 0.04),
+      0 10px 28px rgba(0, 0, 0, 0.48);
+  }
+  100% {
+    box-shadow:
+      inset 0 0 28px rgba(255, 186, 56, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 0 20px rgba(255, 186, 56, 0.12),
+      0 10px 28px rgba(0, 0, 0, 0.48);
+  }
+}
+
+@keyframes signal-unlock-line {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0.92;
+  }
+}
+
+@keyframes signal-frame-expand {
+  0% {
+    clip-path: inset(0 22% 94% 22% round 6px);
+    transform: perspective(880px) rotateX(7deg) scaleX(0.5) scaleY(0.1);
+  }
+  38% {
+    clip-path: inset(0 3% 58% 3% round 5px);
+    transform: perspective(960px) rotateX(5deg) scaleX(0.94) scaleY(0.26);
+  }
+  68% {
+    clip-path: inset(0 0.5% 22% 0.5% round 4px);
+    transform: perspective(1040px) rotateX(3.2deg) scaleX(0.99) scaleY(0.82);
+  }
+  100% {
+    clip-path: inset(0 0 0 0 round 4px);
+    transform: perspective(1100px) rotateX(2.8deg) scale(1, 1);
+  }
+}
+
+@keyframes signal-shell-unfold {
+  0% {
+    opacity: 0.55;
+    clip-path: inset(0 0 100% 0 round 4px);
+    transform: rotateX(7deg) scaleX(0.52) scaleY(0.1);
+    box-shadow:
+      inset 0 0 36px rgba(255, 186, 56, 0.1),
+      0 0 14px rgba(255, 186, 56, 0.08);
+  }
+  42% {
+    opacity: 0.82;
+    clip-path: inset(0 0 52% 0 round 4px);
+    transform: rotateX(5deg) scaleX(0.96) scaleY(0.34);
+    box-shadow:
+      inset 0 0 52px rgba(255, 186, 56, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 0 28px rgba(255, 186, 56, 0.1);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0 round 4px);
+    transform: rotateX(var(--term-tilt-x)) rotateY(var(--term-tilt-y)) translateZ(var(--term-lift-z));
+    box-shadow:
+      inset 0 0 48px var(--phosphor-amber-mist),
+      inset 0 0 100px rgba(255, 186, 56, 0.02),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      inset 1px 0 0 rgba(255, 255, 255, 0.05),
+      inset -1px 0 0 rgba(0, 0, 0, 0.32),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.52),
+      inset 0 0 72px rgba(0, 0, 0, 0.48),
+      0 0 0 1px rgba(0, 0, 0, 0.75),
+      0 0 22px rgba(255, 255, 255, 0.05),
+      0 20px 44px rgba(0, 0, 0, 0.52),
+      0 48px 96px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@keyframes signal-workspace-rise {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes signal-glass-draw {
+  0% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes signal-resolve-jitter {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  20% {
+    transform: translate(1.5px, -0.8px);
+    opacity: 0.97;
+  }
+  45% {
+    transform: translate(-1.2px, 1px);
+    opacity: 1.02;
+  }
+  70% {
+    transform: translate(0.8px, 0.5px);
+    opacity: 0.99;
+  }
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes signal-resolve-scan {
+  0% {
+    transform: translateY(0) scaleY(1.02);
+    opacity: 0.78;
+  }
+  35% {
+    transform: translateY(3px) scaleY(1.06);
+    opacity: 0.92;
+  }
+  65% {
+    transform: translateY(-2px) scaleY(0.98);
+    opacity: 0.84;
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 0.72;
+  }
+}
+
+@keyframes signal-resolve-noise {
+  0% {
+    opacity: 0.04;
+  }
+  30% {
+    opacity: 0.14;
+  }
+  55% {
+    opacity: 0.11;
+  }
+  100% {
+    opacity: 0.065;
+  }
+}
+
+@keyframes signal-resolve-chroma {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  25% {
+    opacity: 0.38;
+    transform: translateX(-2px);
+  }
+  55% {
+    opacity: 0.32;
+    transform: translateX(2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes signal-resolve-flicker {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  20% {
+    opacity: 0.82;
+  }
+  40% {
+    opacity: 0.38;
+  }
+  60% {
+    opacity: 0.74;
+  }
+  80% {
+    opacity: 0.44;
+  }
+}
+
+@keyframes signal-resolve-stabilize {
+  0% {
+    filter: contrast(1.12) saturate(1.05) brightness(1.06);
+  }
+  100% {
+    filter: contrast(1.05) saturate(0.85) brightness(1);
+  }
+}
+
+@keyframes reveal-scan-beam {
+  0% {
+    top: -4%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  100% {
+    top: 102%;
+    opacity: 0;
+  }
+}
+
+@keyframes reveal-phosphor-bloom {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.08);
+  }
+  35% {
+    opacity: 0.55;
+    transform: scaleY(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes content-luminance-scan {
+  0% {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    filter: brightness(0.55) contrast(1.06);
+  }
+  40% {
+    opacity: 0.5;
+    clip-path: inset(42% 0 0 0);
+    filter: brightness(0.88) contrast(1.04);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    filter: none;
+  }
+}
+
+@keyframes content-stack-settle {
+  0% {
+    filter: contrast(1.06) saturate(1.04) brightness(1.04);
+  }
+  100% {
+    filter: none;
+  }
+}
+
+@keyframes content-line-in {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+    filter: brightness(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: none;
+  }
+}
+
+@keyframes reveal-panel-bloom {
+  0% {
+    opacity: 0.35;
+  }
+  40% {
+    opacity: 0.62;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes term-close-content {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.terminal--booting .terminal__boot {
+  opacity: 1;
+  visibility: visible;
+}
+
+.terminal__boot-scan {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(255, 186, 56, 0.14) 2px,
+    rgba(255, 186, 56, 0.14) 3px
+  );
+  opacity: 0.55;
+  animation: boot-scan 0.5s linear forwards;
+}
+
+.terminal__boot-bar {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 18%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.terminal__boot-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--phosphor-amber-hot),
+    var(--phosphor-amber-core)
+  );
+  box-shadow: none;
+  animation: boot-progress 0.5s ease-out forwards;
+}
+
